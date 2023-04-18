@@ -53,22 +53,22 @@ public:
 			"CREATE TABLE IF NOT EXISTS Phones(UserId INTEGER NOT NULL REFERENCES Users(UserId) ON DELETE CASCADE, PhoneNumber BIGINT NOT NULL UNIQUE, CONSTRAINT Phone_db PRIMARY KEY(UserId, PhoneNumber));");
 	}
 	int AddUsers(const std::string& FName, const std::string& LName) {
-		return sql("INSERT INTO Users (FirstName, LastName) VALUES ('" + FName + "', '" + LName + "');");
+		return sql("INSERT INTO Users (FirstName, LastName) VALUES ('" + tx.esc(FName) + "', '" + tx.esc(LName) + "');");
 	}
 	int AddPhone(const int UsId, const long long int Phone) { 
-		return sql("INSERT INTO Phones (UserId, PhoneNumber) VALUES (" + std::to_string(UsId) + ", " + std::to_string(Phone) + "); ");
+		return sql("INSERT INTO Phones (UserId, PhoneNumber) VALUES (" + tx.esc(std::to_string(UsId)) + ", " + tx.esc(std::to_string(Phone)) + "); ");
 	}
 	int ChangeData(const int UsId, const std::string& FName, const std::string& LName) {
-		return sql("UPDATE Users SET FirstName = '" + FName + "', LastName = '" + LName + "'" + "WHERE UserId = " + std::to_string(UsId));
+		return sql("UPDATE Users SET FirstName = '" + tx.esc(FName) + "', LastName = '" + tx.esc(LName) + "'" + "WHERE UserId = " + tx.esc(std::to_string(UsId)));
 	}
 	int DeletePhone(const int UsId) {
-		return sql("DELETE FROM Phones WHERE PhoneId = " + std::to_string(UsId));
+		return sql("DELETE FROM Phones WHERE PhoneId = " + tx.esc(std::to_string(UsId)));
 	}
 	int DeletePhone(const int UsId, const long long int Number) {
-		return sql("DELETE FROM Phones WHERE UserId = " + std::to_string(UsId) + " AND PhoneNumber = " + std::to_string(Number));
+		return sql("DELETE FROM Phones WHERE UserId = " + tx.esc(std::to_string(UsId)) + " AND PhoneNumber = " + tx.esc(std::to_string(Number)));
 	}
 	int DeleteUsers(const int UsId) {
-		return sql("DELETE FROM Users WHERE UserId = " + std::to_string(UsId));
+		return sql("DELETE FROM Users WHERE UserId = " + tx.esc(std::to_string(UsId)));
 	}
 	int FindUsers(const std::string& FName, const std::string& LName, const std::string& email, const long long int phone) {
 		if (!c || !c->is_open()) {
@@ -80,16 +80,16 @@ public:
 		pqxx::work tx{ *c };
 		std::string select = "SELECT Users.UserId, Users.FirstName, Users.LastName, CASE WHEN Emails.Email IS NULL THEN '' ELSE Emails.Email END, CASE WHEN Phones.PhoneNumber IS NULL THEN '' ELSE Phones.PhoneNumber::varchar END FROM Users LEFT JOIN Emails on Emails.UserId = Users.UserId LEFT JOIN Phones on Phones.UserId = Users.UserId";
 		if (!FName.empty()) {
-			select += " WHERE Users.FirstName = '" + FName + "'";
+			select += " WHERE Users.FirstName = '" + tx.esc(FName) + "'";
 		}
 		if (!LName.empty()) {
-				select += " WHERE Users.LastName = '" + LName + "'";
+				select += " WHERE Users.LastName = '" + tx.esc(LName) + "'";
 		}
 		if (!email.empty()) {
-			select += " WHERE Emails.Email = '" + email + "'";
+			select += " WHERE Emails.Email = '" + tx.esc(email) + "'";
 		}
 		if (phone != 0) {
-			select += " WHERE Phones.PhoneNumber = " + std::to_string(phone);
+			select += " WHERE Phones.PhoneNumber = " + tx.esc(std::to_string(phone));
 		}
 		try {
 
