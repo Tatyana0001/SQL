@@ -81,6 +81,7 @@ public:
 
 
 int main() {
+	setlocale(LC_ALL, "Russian");
 	SetConsoleOutputCP(CP_UTF8);
 	try {
 		std::string connectionString =
