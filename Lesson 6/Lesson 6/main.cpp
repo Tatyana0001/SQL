@@ -24,7 +24,7 @@ public:
 class Book;
 class Shop; 
 
-class Stock {   //ассортимент, склад
+class Stock {   
 public:
 	Wt::Dbo::ptr<Book> book;
 	Wt::Dbo::ptr<Shop> shop;
@@ -81,7 +81,6 @@ public:
 
 
 int main() {
-	setlocale(LC_ALL, "Russian");
 	SetConsoleOutputCP(CP_UTF8);
 	try {
 		std::string connectionString =
@@ -102,12 +101,12 @@ int main() {
 		session.mapClass <Sale>("sale");
 
 
-		session.createTables(); //Создаем таблицы
+		session.createTables(); 
 
 //Task 2:
 		Wt::Dbo::Transaction transaction{ session };
 
-		//Добавляем авторов
+		//Add publishers
 		std::unique_ptr<Publisher> publisher1{ new Publisher() };
 		publisher1->name = "Margo";
 		std::unique_ptr<Publisher> publisher2{ new Publisher() };
@@ -121,7 +120,7 @@ int main() {
 		Wt::Dbo::ptr<Publisher> publisherPtr3 = session.add(std::move(publisher3));
 		Wt::Dbo::ptr<Publisher> publisherPtr4 = session.add(std::move(publisher4));
 
-		//Добавляем книги
+		//Add books
 		std::unique_ptr<Book> book1{ new Book() };
 		book1->title = "Love";
 		std::unique_ptr<Book> book2{ new Book() };
@@ -138,7 +137,7 @@ int main() {
 		Wt::Dbo::ptr<Book> bookPtr4 = session.add(std::move(book4));
 		Wt::Dbo::ptr<Book> bookPtr5 = session.add(std::move(book5));
 
-		//Добавляем авторов книг
+		//Add book's publishers
 
 		Wt::Dbo::ptr<Book> B1 = session.find<Book>().where("title = ?").bind("Love");
 		Wt::Dbo::ptr<Publisher>P1 = session.find<Publisher>().where("name = ?").bind("Margo");
@@ -160,7 +159,7 @@ int main() {
 		Wt::Dbo::ptr<Publisher>P5 = session.find<Publisher>().where("id = ?").bind(2);
 		B5.modify()->publisher = P5;
 
-		//Добавляем магазины
+		//Add shops
 		std::unique_ptr<Shop> shop1{ new Shop() };
 		shop1->name = "BookShop1";
 		std::unique_ptr<Shop> shop2{ new Shop() };
@@ -171,7 +170,7 @@ int main() {
 		Wt::Dbo::ptr<Shop> shopPtr2 = session.add(std::move(shop2));
 		Wt::Dbo::ptr<Shop> shopPtr3 = session.add(std::move(shop3));
 
-		//Добавляем ассортимент, количество
+		//Add Stock
 		std::unique_ptr<Stock> stock1{ new Stock() };
 		std::unique_ptr<Stock> stock2{ new Stock() };
 		std::unique_ptr<Stock> stock3{ new Stock() };
@@ -188,7 +187,7 @@ int main() {
 		Wt::Dbo::ptr<Stock> stockPtr4 = session.add(std::move(stock4));
 		Wt::Dbo::ptr<Stock> stockPtr5 = session.add(std::move(stock5));
 
-		//Вводим данные book,shop в Stock
+		//Add data for book,shop in Stock
 		Wt::Dbo::ptr<Stock> S1 = session.find<Stock>().where("id = ?").bind(1);
 		Wt::Dbo::ptr<Stock> S2 = session.find<Stock>().where("id = ?").bind(2);
 		Wt::Dbo::ptr<Stock> S3 = session.find<Stock>().where("id = ?").bind(3);
@@ -213,7 +212,7 @@ int main() {
 		S5.modify()->book = b5;
 		S5.modify()->shop = s1;
 
-		//Добавляем Sale
+		//Add Sale
 		std::unique_ptr<Sale> sale1{ new Sale() };
 		sale1->price = 450;
 		sale1->date_sale = "01.05.2023";
@@ -240,7 +239,7 @@ int main() {
 		sale5->count = 23;
 		Wt::Dbo::ptr<Sale> salePtr5 = session.add(std::move(sale5));
 
-		//Вводим данные stock в Sale
+		//Add data for stock in Sale
 		Wt::Dbo::ptr<Sale> Sl1 = session.find<Sale>().where("id = ?").bind(1);
 		Wt::Dbo::ptr<Sale> Sl2 = session.find<Sale>().where("id = ?").bind(2);
 		Wt::Dbo::ptr<Sale> Sl3 = session.find<Sale>().where("id = ?").bind(3);
@@ -254,7 +253,7 @@ int main() {
 
 		transaction.commit();
 		
-		//Открыть после ввода данных. Поиск магазина по id
+		//Open after entering all the data. Shop search by id.
 /*
 		typedef Wt::Dbo::collection < Wt::Dbo::ptr<Publisher>> Publishers;
 		int id;
